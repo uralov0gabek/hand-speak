@@ -25,7 +25,7 @@ export default function App() {
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-accent/10 blur-[120px] pointer-events-none" />
 
       {/* Header Navigation */}
-      <header className="w-full z-10 glassmorphism sticky top-0 md:relative md:bg-transparent md:border-none md:backdrop-blur-none px-6 py-4 flex items-center justify-between">
+      <header className="w-full z-50 glassmorphism sticky top-0 md:relative md:bg-transparent md:border-none md:backdrop-blur-none px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center relative transition-all duration-500 ${isHandVisible ? 'bg-primary/20 border-primary/50 pulse-glow' : 'glassmorphism'}`}>
             <Activity size={18} className={isHandVisible ? 'text-primary' : 'text-zinc-400'} />
@@ -57,7 +57,7 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-8 flex flex-col items-center gap-6 z-10">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 md:py-8 flex flex-col items-center gap-4 md:gap-6 z-10 relative">
         
         {/* Title & Status */}
         <div className="flex flex-col items-center text-center gap-3 w-full max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -77,7 +77,7 @@ export default function App() {
         </div>
 
         {/* Core Layout: Camera + Translation Box */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in zoom-in-95 duration-700 delay-150">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-stretch animate-in fade-in zoom-in-95 duration-700 delay-150">
           
           {/* Camera Section (Left on Desktop, Top on Mobile) */}
           <div className="lg:col-span-8 flex flex-col gap-4">
@@ -120,7 +120,7 @@ export default function App() {
               text={translatedText} 
               history={translationHistory}
               isTranslating={isTranslating} 
-              className="h-full min-h-[300px]"
+              className="h-full min-h-[200px] md:min-h-[300px]"
             />
           </div>
 
