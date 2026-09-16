@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+MP_Data/
+Logs/
+*.h5
+.env
+dataset/
+*.csv
+*.task
+model/
