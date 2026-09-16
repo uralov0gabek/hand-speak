@@ -151,17 +151,81 @@ export function CameraView({ isActive, onHandDetected, className }: CameraViewPr
 
                   if (maxScore >= MIN_CONFIDENCE) {
                     // --- Heuristic Filters ---
-                    // Fix false positive: Open hand (fingers spread) being detected as 'B'
+                    const getDist = (p1: {x: number, y: number}, p2: {x: number, y: number}) => 
+                      Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+                    
+                    const palmSize = getDist(landmarks[0], landmarks[9]);
+                    
+                    const isExtended = (tipId: number, pipId: number) => {
+                      return getDist(landmarks[0], landmarks[tipId]) > getDist(landmarks[0], landmarks[pipId]) + palmSize * 0.1;
+                    };
+
+                    const indexUp = isExtended(8, 6);
+                    const middleUp = isExtended(12, 10);
+                    const ringUp = isExtended(16, 14);
+                    const pinkyUp = isExtended(20, 18);
+
                     if (detectedLetter === 'B') {
-                      const getDist = (p1: {x: number, y: number}, p2: {x: number, y: number}) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
                       const spreadDist = getDist(landmarks[8], landmarks[20]); // index tip to pinky tip
-                      const palmSize = getDist(landmarks[0], landmarks[9]); // wrist to middle mcp
                       const wristToMidTip = getDist(landmarks[0], landmarks[12]); // wrist to middle tip
-                      
-                      // 1. Fingers must be touching (spreadDist is very small, < 0.5 of palm size)
-                      // 2. Fingers must be straight up (not relaxed/curled) -> wristToMidTip > palmSize * 1.6
+                      // 1. Fingers must be touching (spreadDist is very small)
+                      // 2. Fingers must be straight up
                       if (spreadDist > palmSize * 0.5 || wristToMidTip < palmSize * 1.6) {
                         detectedLetter = null;
+                      }
+                    }
+                    else if (detectedLetter === 'U' || detectedLetter === 'V') {
+                      if (!indexUp || !middleUp || ringUp || pinkyUp) {
+                        detectedLetter = null;
+                      } else {
+                        const spread = getDist(landmarks[8], landmarks[12]);
+                        if (spread < palmSize * 0.35) {
+                          detectedLetter = 'U';
+                        } else {
+                          detectedLetter = 'V';
+                        }
+                      }
+                    }
+                    else if (detectedLetter === 'O' || detectedLetter === 'C') {
+                      const gap = getDist(landmarks[4], landmarks[8]); // thumb to index tip
+                      if (gap < palmSize * 0.3) {
+                        detectedLetter = 'O'; // Closed circle
+                      } else {
+                        detectedLetter = 'C'; // Open circle
+                      }
+                    }
+                    else if (detectedLetter === 'F') {
+                      const gap = getDist(landmarks[4], landmarks[8]);
+                      if (gap > palmSize * 0.4 || !middleUp || !ringUp || !pinkyUp) {
+                        detectedLetter = null;
+                      }
+                    }
+                    else if (detectedLetter === 'K') {
+                      if (!indexUp || !middleUp || ringUp || pinkyUp) {
+                        detectedLetter = null;
+                      } else {
+                        const thumbToMidPip = getDist(landmarks[4], landmarks[10]);
+                        if (thumbToMidPip > palmSize * 0.8) {
+                          detectedLetter = null;
+                        }
+                      }
+                    }
+                    else if (detectedLetter === 'Z') {
+                      if (!indexUp || middleUp || ringUp || pinkyUp) {
+                        detectedLetter = null;
+                      }
+                    }
+                    else if (['M', 'N', 'T', 'S', 'E'].includes(detectedLetter as string)) {
+                      if (indexUp || middleUp || ringUp || pinkyUp) {
+                        detectedLetter = null; // They must all be curled
+                      } else {
+                        const indexTipToWrist = getDist(landmarks[8], landmarks[0]);
+                        const indexKnuckleToWrist = getDist(landmarks[5], landmarks[0]);
+                        const isTightFist = indexTipToWrist < indexKnuckleToWrist + palmSize * 0.2;
+                        
+                        if (!isTightFist && detectedLetter !== 'E') {
+                          detectedLetter = null; 
+                        }
                       }
                     }
 
