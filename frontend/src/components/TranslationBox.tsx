@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Loader2, History, Sparkles } from 'lucide-react';
+import { Loader2, History } from 'lucide-react';
 
 interface TranslationBoxProps {
   text: string;
